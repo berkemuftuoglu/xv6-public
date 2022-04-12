@@ -6,10 +6,25 @@
 int
 main(int argc, char *argv[])
 {
-  int myarray[7] = {9, 8, 7, 6, 5, 4, 3};
-  int x = PGROUNDDOWN(((int)myarray));
-  int mprotect_return = mprotect((void*) x, 4);
-  printf(1, "mprotect returned %d\n", mprotect_return);
+  char* start = sbrk(0);
+  sbrk(PGSIZE);
+  *start=100;
+  mprotect(start, 1);
+  printf(1, "protected value = %d\n", *start);
+
+  int pid = fork();
+  if (pid == 0) {
+    printf(1, "I am child\n");
+    printf(1, "protected value = %d\n", *start);
+    *start = 101;
+    printf(1, "if you see this you fail.\n");
+    exit();
+  } else if (pid > 0) {
+    printf(1, "I am parent I am exiting.\n");
+    wait();
+    exit();
+  }
+
 
   exit();
 } 
