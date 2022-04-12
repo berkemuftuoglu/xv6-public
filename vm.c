@@ -392,6 +392,13 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
+int 
+mprotect(void* addr, int len)
+{
+  cprintf("Hi, I am mprotect and i got %d as length\n", len);
+  return 75;
+}
+
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!
