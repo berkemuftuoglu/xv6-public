@@ -425,6 +425,39 @@ mprotect(void* addr, int len)
   return 0;
 }
 
+int 
+munprotect(void* addr, int len)
+{
+  struct proc* currentProc = myproc();
+  if (len <= 0) {
+    cprintf("\n mprotect: length is 0 or less!, error!\n");
+    return -1;
+  }
+  if ((uint) addr % PGSIZE != 0) {
+    cprintf("\n mprotect: addr is not page aligned, error!\n");
+    return -1;
+  }
+  pte_t* pte;
+  pte = walkpgdir(currentProc->pgdir, addr, 0);
+  if (pte == 0)
+    panic("mprotect");
+
+  int addr_index;
+  for (addr_index = (int) addr; addr_index < ((int) addr + (len * PGSIZE)); addr_index += PGSIZE)
+  {
+    pte = walkpgdir(currentProc->pgdir, (void*) addr_index, 0);
+    if (((*pte & PTE_U) != 0) && ((*pte & PTE_P) != 0)) {
+      *pte |= PTE_W;
+      cprintf("write bit set %p\n", pte);
+    } else {
+      return -1;
+    }
+  }
+  cprintf("write bit set hello %p\n", pte);
+  lcr3(V2P(currentProc->pgdir));
+  return 0;
+}
+
 //PAGEBREAK!
 // Blank page.
 //PAGEBREAK!

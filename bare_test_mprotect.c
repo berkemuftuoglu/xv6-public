@@ -16,12 +16,17 @@ main(int argc, char *argv[])
   if (pid == 0) {
     printf(1, "I am child\n");
     printf(1, "protected value = %d\n", *start);
+    munprotect(start, 1);
+
     *start = 101;
-    printf(1, "if you see this you fail.\n");
+    printf(1, "if you see this change you succeed, unprotected value became: %d.\n", *start);
     exit();
   } else if (pid > 0) {
-    printf(1, "I am parent I am exiting.\n");
     wait();
+    printf(1, "I am parent, i will fail\n");
+    printf(1, "protected value = %d\n", *start);
+    *start = 101;
+    printf(1, "if you see this you fail.\n");
     exit();
   }
 
